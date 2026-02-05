@@ -16,5 +16,16 @@ uv run fastapi dev src/  -> find inside src/__init__.py
 for docker 
 
 
+
 docker start pg-db
 docker stop pg-db
+
+
+docker exec -it pg-db psql -U appuser -d bookly_db
+
+
+==============================================================================
+uv add alembic                                                :  Add db migration ( new table is added so needed)
+alembic init -t async migration                               : initialize 
+alembic revision --autogenerate -m "init"                     : create migration file
+alembic upgrade head                                          : apply migration
