@@ -4,8 +4,10 @@ from src.auth.service import UserService
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from .utils import create_access_token, decode_access_token, verify_password
-from datetime import timedelta
+from datetime import timedelta, datetime
 from fastapi.responses import JSONResponse
+from .dependencies import RefreshTokenBearer, AccessTokenBearer
+from src.db.redis import add_jti_to_blocklist
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -66,3 +68,28 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="email or password is not valid",
         )
+
+
+@auth_router.get("/refresh_token")
+async def get_new_refresh_token(token_details: dict = Depends(RefreshTokenBearer())):
+    expire_timestamp = token_details["exp"]
+
+    if datetime.fromtimestamp(expire_timestamp) < datetime.now():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Token is expired"
+        )
+
+    new_access_token = create_access_token(user_data=token_details["user"])
+
+    return JSONResponse(content={"access_token": new_access_token})
+
+
+@auth_router.get("/logout")
+async def revoke_token(token_details: dict = Depends(AccessTokenBearer())):
+    await add_jti_to_blocklist(token_details["jti"])
+    return JSONResponse(
+        content={
+            "message": "Token revoked successfully. Logged out sucessfully",
+        },
+        status_code=status.HTTP_200_OK,
+    )
