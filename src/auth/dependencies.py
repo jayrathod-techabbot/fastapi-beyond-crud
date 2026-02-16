@@ -1,5 +1,5 @@
 from fastapi.security import HTTPBearer 
-from fastapi import Request , HTTPException , status
+from fastapi import Request , HTTPException , status, Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from src.auth.utils import decode_access_token
 from src.db.redis import token_in_blocklist
@@ -58,3 +58,5 @@ class RefreshTokenBearer(TokenBearer):
                 detail="Please provide refresh token not access token"
             )
 
+def get_current_user(token_details: dict = Depends(AccessTokenBearer())) -> dict:
+    return token_details['user']
