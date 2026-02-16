@@ -6,6 +6,8 @@ from src.db.redis import token_in_blocklist
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.service import UserService
+from .models import User
+from typing import List, Any
 
 user_service = UserService()
 
@@ -74,3 +76,17 @@ async def get_current_user(
     user_email = token_details["user"]["email"]
     user = await user_service.get_user_by_email(user_email, session)
     return user
+
+
+class RoleChecker:
+    def __init__(self, allowed_roles: List[str]) -> None:
+        self.allowed_roles = allowed_roles
+
+    async def __call__(self,curr_user:User = Depends(get_current_user)):
+        if curr_user.role in self.allowed_roles:
+            return True
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to access this resource",
+        )
+
