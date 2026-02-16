@@ -17,8 +17,7 @@ version = "v1"
 app = FastAPI(
     title="Book API",
     description="Book API Description",
-    version=version,
-    lifespan=lifespan
+    version=version
 )
 
 @app.get("/")

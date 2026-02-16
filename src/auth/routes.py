@@ -6,16 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .utils import create_access_token, decode_access_token, verify_password
 from datetime import timedelta, datetime
 from fastapi.responses import JSONResponse
-from .dependencies import RefreshTokenBearer, AccessTokenBearer
+from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_user
 from src.db.redis import add_jti_to_blocklist
 
 auth_router = APIRouter()
 user_service = UserService()
-
-
-@auth_router.get("/")
-async def get_current_user(session: AsyncSession = Depends(get_session)):
-    return {"user": "jay"}
 
 
 @auth_router.post(
@@ -82,6 +77,10 @@ async def get_new_refresh_token(token_details: dict = Depends(RefreshTokenBearer
     new_access_token = create_access_token(user_data=token_details["user"])
 
     return JSONResponse(content={"access_token": new_access_token})
+
+@auth_router.get("/me")
+async def get_current_user(user: dict = Depends(get_current_user)):
+    return user
 
 
 @auth_router.get("/logout")
