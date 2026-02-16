@@ -43,11 +43,11 @@ async def login(
         password_valid = verify_password(password, user.password_hash)
         if password_valid:
             access_token = create_access_token(
-                user_data={"email": user.email, "uid": str(user.uid),"role":user.role}
+                user_data={"email": user.email, "user_uid": str(user.uid),"role":user.role}
             )
 
             refresh_token = create_access_token(
-                user_data={"email": user.email, "uid": str(user.uid)},
+                user_data={"email": user.email, "user_uid": str(user.uid)},
                 expiry=timedelta(days=7),
                 refresh=True,
             )
@@ -56,7 +56,7 @@ async def login(
                     "message": "Login successful",
                     "access_token": access_token,
                     "refresh_token": refresh_token,
-                    "user": {"email": user.email, "uid": str(user.uid)},
+                    "user": {"email": user.email, "user_uid": str(user.uid)},
                 }
             )
     else:
@@ -79,7 +79,7 @@ async def get_new_refresh_token(token_details: dict = Depends(RefreshTokenBearer
 
     return JSONResponse(content={"access_token": new_access_token})
 
-@auth_router.get("/me")
+@auth_router.get("/me",response_model=UserResponseModel)
 async def get_current_user(user: dict = Depends(get_current_user),_:bool = Depends(role_checker)):
     return user
 
