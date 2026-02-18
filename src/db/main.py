@@ -4,7 +4,7 @@ from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-engine = create_async_engine(url= Config.DATABASE_URL,echo=True)
+engine = create_async_engine(url= Config.DATABASE_URL) # echo=True for printing queries in console
 # SQLModel.metadata.create_all(engine)
 
 
