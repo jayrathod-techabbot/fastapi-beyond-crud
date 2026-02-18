@@ -4,6 +4,7 @@ from src.auth.schemas import (
     UserResponseModel,
     UserLoginModel,
     UserBooksModel,
+    EmailModel,
 )
 from src.auth.service import UserService
 from src.db.main import get_session
@@ -19,10 +20,22 @@ from .dependencies import (
 )
 from src.db.redis import add_jti_to_blocklist
 from src.errors import UserAlreadyExists, InvalidCredentials, InvalidToken, TokenExpired
+from src.mail import create_message, mail
 
 auth_router = APIRouter()
 user_service = UserService()
 role_checker = RoleChecker(["admin", "user"])
+
+
+@auth_router.post("/send_mail")
+async def send_mail(emails: EmailModel):
+    emails = emails.addresses
+    html = "<h1> Welcome to the app </h1>"
+    message = create_message(
+        recipients=emails, subject="Welcome to the app", body=html
+    )
+    await mail.send_message(message)
+    return JSONResponse(content={"message": "Email sent successfully"})
 
 
 @auth_router.post(

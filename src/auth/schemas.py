@@ -34,3 +34,7 @@ class UserLoginModel(BaseModel):
 class UserBooksModel(UserResponseModel):
     books: List[Book]
     reviews: List[ReviewModel]
+
+
+class EmailModel(BaseModel):
+    addresses: List[str]
