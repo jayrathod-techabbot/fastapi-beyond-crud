@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from src.auth.schemas import UserCreateModel, UserResponseModel, UserLoginModel
+from src.auth.schemas import UserCreateModel, UserResponseModel, UserLoginModel,UserBooksModel
 from src.auth.service import UserService
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -79,7 +79,7 @@ async def get_new_refresh_token(token_details: dict = Depends(RefreshTokenBearer
 
     return JSONResponse(content={"access_token": new_access_token})
 
-@auth_router.get("/me",response_model=UserResponseModel)
+@auth_router.get("/me",response_model=UserBooksModel)
 async def get_current_user(user: dict = Depends(get_current_user),_:bool = Depends(role_checker)):
     return user
 

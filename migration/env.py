@@ -9,8 +9,8 @@ from alembic import context
 
 
 # import models
-from src.books.models import Book
-from src.auth.models import User
+from src.db.models import Book
+from src.db.models import User
 
 from sqlmodel import SQLModel
 from src.config import Config

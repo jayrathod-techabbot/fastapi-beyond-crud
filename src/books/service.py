@@ -1,5 +1,5 @@
 from sqlmodel import select, desc
-from .models import Book
+from src.db.models import Book
 from sqlalchemy.ext.asyncio import AsyncSession
 from .schema import BookCreate, BookUpdate
 from datetime import datetime

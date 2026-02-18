@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Depends, HTTPException
-from .schema import BookUpdate, Book, BookCreate
+from .schema import BookUpdate, Book, BookCreate , BookDetailModel
 from src.books.service import BookService
 
 # from .books_data import books
@@ -55,7 +55,7 @@ async def get_user_book_submissions(
     return books
 
 
-@book_router.get("/{book_id}", response_model=Book, dependencies=[role_checker])
+@book_router.get("/{book_id}", response_model=BookDetailModel, dependencies=[role_checker])
 async def get_book_by_id(
     book_id: str,
     session: AsyncSession = Depends(get_session),

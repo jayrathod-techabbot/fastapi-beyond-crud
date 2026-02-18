@@ -6,7 +6,7 @@ from src.db.redis import token_in_blocklist
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.service import UserService
-from .models import User
+from src.db.models import User
 from typing import List, Any
 
 user_service = UserService()

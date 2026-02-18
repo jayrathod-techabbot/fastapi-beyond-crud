@@ -1,4 +1,4 @@
-from .models import User
+from src.db.models import User
 from .schemas import UserCreateModel
 from typing import Optional
 # from sqlalchemy.ext.asyncio.session import AsyncSession
