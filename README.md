@@ -10,8 +10,9 @@ uv run fastapi dev index.py     ->
 
 IF SEPERATE FOLDER THEN 
 
-uv run fastapi dev src/                 ->           find inside src/__init__.py
 
+uv run fastapi dev src/                 ->           find inside src/__init__.py
+docker start pg-db redis
 =============================================================================
 
 for docker -> Db : postgres
