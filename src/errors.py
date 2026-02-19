@@ -1,7 +1,8 @@
 from typing import Any, Callable
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from fastapi import FastAPI,status
+from fastapi import FastAPI, status
+
 
 class BooklyException(Exception):
     """Base class"""
@@ -71,6 +72,18 @@ class ReviewNotFound(BooklyException):
 
 class UserNotFound(BooklyException):
     """User is not found"""
+
+    pass
+
+
+class AccountNotVerified(BooklyException):
+    """Account is not verified"""
+
+    pass
+
+
+class PasswordMismatch(BooklyException):
+    """Password does not match"""
 
     pass
 
@@ -195,6 +208,29 @@ def register_all_errors(app: FastAPI):
             inital_details={
                 "message": "User not found",
                 "error_code": "USER_NOT_FOUND",
+            },
+        ),
+    )
+
+    app.add_exception_handler(
+        AccountNotVerified,
+        create_exception_handler(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            inital_details={
+                "message": "Account is not verified yet",
+                "error_code": "ACCOUNT_NOT_VERIFIED",
+                "resolution": "Please verify your account",
+            },
+        ),
+    )
+
+    app.add_exception_handler(
+        PasswordMismatch,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            inital_details={
+                "message": "Password & confirm password does not match",
+                "error_code": "PASSWORD_MISMATCH",
             },
         ),
     )
