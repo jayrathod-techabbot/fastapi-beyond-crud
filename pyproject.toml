@@ -11,6 +11,7 @@ dependencies = [
     "bcrypt>=5.0.0",
     "fastapi-mail>=1.6.2",
     "fastapi[standard]>=0.128.0",
+    "itsdangerous>=2.2.0",
     "passlib>=1.7.4",
     "pyjwt>=2.11.0",
     "redis>=4.5",
