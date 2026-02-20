@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from src.auth.schemas import (
     UserCreateModel,
     UserResponseModel,
@@ -37,8 +37,9 @@ from src.errors import (
     UserNotFound,
     PasswordMismatch,
 )
-from src.mail import create_message, mail
+
 from src.config import Config
+from src.celery_tasks import send_mail
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -49,14 +50,24 @@ role_checker = RoleChecker(["admin", "user"])
 async def send_mail(emails: EmailModel):
     emails = emails.addresses
     html = "<h1> Welcome to the app </h1>"
-    message = create_message(recipients=emails, subject="Welcome to the app", body=html)
-    await mail.send_message(message)
+
+    # NORMAL EMAIL SEND
+
+    # message = create_message(recipients=emails, subject="Welcome to the app", body=html)
+    # await mail.send_message(message)
+
+    # WITH CELERY
+    subject = "Welcome to the app"
+    send_mail.delay(recipients=emails, subject=subject, html=html)
+
     return JSONResponse(content={"message": "Email sent successfully"})
 
 
 @auth_router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user_account(
-    user_data: UserCreateModel, session: AsyncSession = Depends(get_session)
+    user_data: UserCreateModel,
+    bg_tasks: BackgroundTasks,
+    session: AsyncSession = Depends(get_session),
 ):
     email = user_data.email
     user_exists = await user_service.user_exists(email, session)
@@ -71,10 +82,6 @@ async def create_user_account(
                 <p> Click on the link to verify your email </p>
                 <a href="{link}"> Verify Email </a>
                 """
-    message = create_message(
-        recipients=[email], subject="Verify your email", body=html_message
-    )
-    await mail.send_message(message)
 
     return JSONResponse(
         content={
@@ -184,10 +191,19 @@ async def password_reset_request(
                 <p> Click on the link to reset your password </p>
                 <a href="{link}"> Reset Password </a>
                 """
-    message = create_message(
-        recipients=[email], subject="Reset your password", body=html_message
-    )
-    await mail.send_message(message)
+
+    # NORMAL EMAIL
+
+    # message = create_message(
+    #     recipients=[email], subject="Reset your password", body=html_message
+    # )
+    # await mail.send_message(message)
+
+    # WITH CELERY
+    subject = "Reset your password"
+    emails = [email]
+    send_mail.delay(recipients=emails, subject=subject, html=html_message)
+
     return JSONResponse(
         content={
             "message": "Password reset link sent successfully",

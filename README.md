@@ -35,3 +35,19 @@ uv add alembic                                                :  Add db migratio
 alembic init -t async migration                               : initialize 
 alembic revision --autogenerate -m "init"                     : create migration file
 alembic upgrade head                                          : apply migration
+
+
+==============================================================================
+for background task
+
+uv add celery
+uv add asgiref
+
+
+start worker
+
+celery -A src.celery_tasks.c_app worker
+
+or 
+
+celery -A src.celery_tasks.c_app worker --pool=solo
